@@ -1,14 +1,42 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import Button from '../components/Button';
-import Input from '../components/input';
 import { Link, useNavigation } from 'expo-router';
+import {z} from "zod";
+import { useState } from 'react';
+
+const LoginSchema = z.object({
+  email: z.string().email({message: "invalid email address"}),
+  password: z.string().min(8, { message : "Must be 8 character or more long"})
+});
 
 export default function App() {
-  const navigation = useNavigation();
-  const handleIndex = () => {
-  navigation.navigate('(home)');
-  }
+  const [form, setForm] = useState({email: "", password: ""});
+  const [errorMsg, setErrors] = useState({});
+
+  const handleInputChange = (key, value) => {
+    setForm({...form, [key]: value });
+    try{
+      LoginSchema.pick({ [key]: true }).parse({ [key]: value });
+      setErrors((prev) => ({ ...prev, [key]: "" })); 
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, [key]: error.errors[0].message })); 
+    }
+  };
+
+  const handleSubmit = () => {
+    try {
+        LoginSchema.parse(form);
+    } catch (error) {
+      const errors = {};
+      err.errors.forEach((item) => {
+        const key = item.path[0];
+        errors[key] = item.message;
+      });
+      setErrors(errors);
+    }
+  };
+
   return (
     <View style={styles.container}>
 
@@ -23,24 +51,35 @@ export default function App() {
         placeholder="Email" 
         placeholderTextColor="#aaa" 
         keyboardType='email-address'
+        onChangeText={(text) => handleInputChange('email', text)}
       />
-      
+
+      {errorMsg.email ? <Text style={styles.errorMsg}>{errorMsg.email}</Text> : null}
+
       <TextInput 
         style={styles.input} 
         placeholder="Password" 
         placeholderTextColor="#aaa" 
         secureTextEntry={true}
+        onChangeText={(text) => handleInputChange('password', text)}
+        value={form.password}
       />
 
-      {/* <Link href="/(home)" style={styles.linkText}>Masuk</Link> */}
-      <Button text = "Login" onPress={handleIndex}/>
+      {errorMsg.password ? <Text style={styles.errorMsg}>{errorMsg.password}</Text> : null}
 
-      <Text style={{alignSelf: "flex-start", padding: 10}}>Don't have account? <Link href="/register" style={styles.register}>Register here</Link> </Text>
+      {/* <Link href="/(home)" style={styles.linkText}>Masuk</Link> */}
+      <Button handlePress = {handleSubmit} text = "Login"/>
+
+      <Text style={{alignSelf: "flex-start", padding: 10}}>
+        Don't have account? {""}
+        <Link href="/register" style={styles.register}>
+        Register here</Link>
+      </Text>
 
       <StatusBar style="auto" hidden />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -65,9 +104,9 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 15,
+    borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 15,
+    marginTop: 15,
     backgroundColor: '#f9f9f9',
     fontSize: 16,
   },
@@ -79,5 +118,9 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: '#19918F'
+  },
+  errorMsg: {
+    color: 'red',
+    width: '100%'
   }
 })
