@@ -1,20 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, TextInput, Image } from 'react-native';
-import HelloWorld from './components/HelloWorld';
-import Button from './components/Button';
-import Input from './components/input';
+import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
+import Button from '../components/Button';
+import Input from '../components/input';
+import { Link } from 'expo-router';
+import { useNavigation } from 'expo-router';
 
-export default function App() {
+export default function Register() {
+    const navigation = useNavigation();
+    const handleRegister = () => {
+        navigation.navigate('index');
+    }
+    
   return (
     <View style={styles.container}>
 
       <Image
-      source={require('./assets/logo.png')}
+      source={require('../assets/logo.png')}
       style={styles.logo}
       resizeMode='stretch'
       />
 
-      {/* <HelloWorld /> */}
+      <TextInput 
+        style={styles.input} 
+        placeholder="Fullname" 
+        placeholderTextColor="#aaa" 
+      />
       
       <TextInput 
         style={styles.input} 
@@ -29,10 +39,17 @@ export default function App() {
         placeholderTextColor="#aaa" 
         secureTextEntry={true}
       />
-      
-      <Input text ="Notes"/>
 
-      <Button text = "Login"/>
+      <TextInput 
+        style={styles.input} 
+        placeholder="Avatar url" 
+        placeholderTextColor="#aaa" 
+        keyboardType='url'
+      />
+
+      <Button text = "Register" onPress={handleRegister}/>
+
+      <Text style={{alignSelf: "flex-start", padding: 10}}>Already have account? <Link href="/" style={styles.register}>Sign in here</Link> </Text>
 
       <StatusBar style="auto" hidden />
     </View>
@@ -68,4 +85,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     fontSize: 16,
   },
+  register: {
+    color: '#19918F',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline'
+  }
 });
