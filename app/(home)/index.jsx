@@ -11,7 +11,7 @@ function LogoTitle({user}) {
     <TouchableOpacity
       style={[
         styles.avatarContainer,
-        { borderColor: setIsAvatarActive ? '#178F8D' : '#fafbfd' },
+        { borderColor: isAvatarActive ? '#178F8D' : '#fafbfd' },
       ]}
       onPress={() => setIsAvatarActive((prev) => !prev)}
       activeOpacity={0.8}
@@ -22,7 +22,8 @@ function LogoTitle({user}) {
   );
 }
 export default function Home() {
-  const [user,setUser]= useState({})
+  const [user,setUser]= useState({});
+  const [showBalance, setShowBalance] = useState({});
   useEffect (() => {
     const getData = async () => {
       try {
@@ -77,9 +78,13 @@ export default function Home() {
           <View>
             <Text style={{ fontSize: 20 }}>Balance</Text>
             <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-              Rp{new Intl.NumberFormat('id-ID').format(user.balance)}
+              {showBalance ? `Rp${user?.balance}` : "Rp ***"}
+              <TouchableOpacity onPress={() => setShowBalance((prev) => !prev)}>
+                <Image source={require('../../assets/view.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+              </TouchableOpacity>
             </Text>
           </View>
+          
           <View>
             <View style={{ gap: 20 }}>
               <TouchableOpacity style={{ width: 40, height: 40, backgroundColor: '#19918F', borderRadius: 10, alignItems: 'center', justifyContent: 'center' }}>

@@ -4,8 +4,7 @@ import Amount from "../../components/Amount";
 import Button from "../../components/Button";
 
 export default function Transfer() {
-    // const [showBalance, setShowBalance] = useState(true);
-
+    const [showBalance, setShowBalance] = useState(true);
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#ddd' }}>
             <View style={{backgroundColor: '#19918F', paddingHorizontal: 20, paddingVertical: 8, width: '100%', flexDirection: 'row', alignItems: 'center' }}>
@@ -20,12 +19,11 @@ export default function Transfer() {
                         marginBottom={24} 
                         balance={showBalance ? "Rp10.000.000,00" : "Rp ********"} 
                     />
-                  {/* <Image 
-                    
-                    source={require('../../assets/view.png')}
+                  <Image 
+                    source={{ uri: "../../assets/view.png" }}
                     resizeMode= 'contain'
                     onTouchEnd={() => setShowBalance((prev) => !prev)}
-                /> */}
+                />
                     <Input text={"Notes"} />
                 </View>
                 <Button marginTop={240} marginBottom={20} text="Transfer" />
