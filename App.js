@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TextInput, Image } from 'react-native';
-import HelloWorld from './components/HelloWorld';
 import Button from './components/Button';
 import Input from './components/input';
 
@@ -13,8 +12,6 @@ export default function App() {
       style={styles.logo}
       resizeMode='stretch'
       />
-
-      {/* <HelloWorld /> */}
       
       <TextInput 
         style={styles.input} 
@@ -67,5 +64,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f9f9f9',
     fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#4DB6AC",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 15,
+    width: "100%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

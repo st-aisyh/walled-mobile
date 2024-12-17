@@ -1,3 +1,4 @@
+import { Link, Stack } from 'expo-router';
 import { Image, Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -6,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 function LogoTitle({user}) {
-  const [isAvatarActive, setIsAvatarActive] = useState(true);
+  const [isAvatarActive, setIsAvatarActive] = useState(false);
+  console.log("USER", user);
   return (
     <TouchableOpacity
       style={[
@@ -36,8 +38,6 @@ export default function Home() {
               },
             }
           );
-          console.log(value)
-          console.log(res.data)
           const user = res.data.data
           setUser(user)
         }
@@ -51,14 +51,17 @@ export default function Home() {
   return (
     <ScrollView containerStyle={styles.container}>
       <View style={styles.header}>
+
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <LogoTitle user={user} />
           <View>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{user.fullname}</Text>
-            <Text style={{ fontSize: 18 }}>Personal Account</Text>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', marginInline: 5 }}>{user.fullname}</Text>
+            <Text style={{ fontSize: 18, marginInline: 5 }}>Personal Account</Text>
           </View>
         </View>
+
         <Image source={require('../../assets/suntoggle.png')} />
+
       </View>
       <View style={{ backgroundColor: '#FAFBFD', paddingHorizontal: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 25, justifyContent: 'space-between' }}>
@@ -76,9 +79,9 @@ export default function Home() {
 
         <View style={styles.balancebox}>
           <View>
-            <Text style={{ fontSize: 20 }}>Balance</Text>
-            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-              {showBalance ? `Rp${user?.balance}` : "Rp ***"}
+            <Text style={{ fontSize: 22 }}>Balance</Text>
+            <Text style={{ fontSize: 27, fontWeight: 'bold' }}>
+              {showBalance ? `Rp${user?.balance || 0}` : "Rp ***"}
               <TouchableOpacity onPress={() => setShowBalance((prev) => !prev)}>
                 <Image source={require('../../assets/view.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
               </TouchableOpacity>
@@ -97,7 +100,7 @@ export default function Home() {
           </View>
         </View>
 
-        <ScrollView style={{ flex: 1, backgroundColor: '#fff', marginTop: 40, borderRadius: 10 }}>
+        <ScrollView style={styles.transaction}>
           <Text style={{ fontSize: 20, fontWeight: 'bold', padding: 20, borderBottomColor: '#b3b3b3', borderBottomWidth: 0.5, }}>Transaction History</Text>
           {transactions.map((transaction) => (
             <View key={transaction.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 15 }}>
@@ -155,9 +158,9 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 8,
   },
   accountnumber: {
     paddingHorizontal: 20,
@@ -167,8 +170,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#19918F',
     marginTop: 30,
-    marginBottom: 40,
-    borderRadius: 10
+    marginBottom: 20,
+    borderRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  avatarContainer:{
+    borderRadius: 9999, // Full circle
+    borderWidth: 4,
+    cursor: "pointer", // Optional for web
+    transition: "all 0.3s", // Optional for web
   },
   header: {
     width: '100%',
@@ -188,4 +204,17 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50
   },
+  transaction : {
+    flex: 1, 
+    backgroundColor: '#fff',
+    marginTop: 25,
+    borderRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 8,
+  }
 });

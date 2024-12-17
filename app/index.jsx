@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import Button from '../components/Button';
-import { Link, useNavigation, useRouter, router } from 'expo-router';
+import { Link, useRouter, router } from 'expo-router';
 import {z} from "zod";
 import { useState } from 'react';
 import axios from 'axios';
@@ -16,8 +16,6 @@ export default function App() {
   const [form, setForm] = useState({email: "", password: ""});
   const [errorMsg, setErrors] = useState({});
   const[serverError, setServerError] = useState("");
-
-  const router = useRouter();
 
   const handleInputChange = (key, value) => {
     setForm({...form, [key]: value });
@@ -39,33 +37,33 @@ export default function App() {
         await AsyncStorage.setItem("token", res.data.data.token);
         router.replace("/(home)")
     } catch (error) {
-      if(axios.isAxiosError(error)) {
-        if(error.response) {
-          setServerError(error.response.data.message || "An error occurred");
-        } else if (error.request) {
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          setServerError(err.response.data.message || "An error occurred");
+        } else if (err.request) {
           setServerError("Network error. Please try again later.");
-          console.error("Network error:", error.request);
+          console.error("Network Error:", err.request);
         } else {
           setServerError("An unexpected error occurred.");
-          console.error("Request Setup Error:", error.message);
+          console.error("Request Setup Error:", err.message);
         }
-      } else if(error?.errors) {
+      } else if (err?.errors) {
         const errors = {};
         err.errors.forEach((item) => {
           const key = item.path[0];
           errors[key] = item.message;
-      });
-      setErrors(errors);
-    } else {
-      setServerError("An unknown error occurred.");
-      console.error("Unhandled Error:", error);
+        });
+        setErrors(errors);
+      } else {
+        setServerError("An unknown error occurred.");
+        console.error("Unhandled Error:", err);
+      }
     }
-  }
 };
 
   return (
     <View style={styles.container}>
-      {serverError && <Text style={styles.errorMsg}>{serverError}</Text>}
+      {serverError && <Text>{serverError}</Text>}
 
       <Image
         source={require('../assets/logo.png')}
@@ -74,17 +72,19 @@ export default function App() {
       />
       
       <TextInput 
-        style={styles.input} 
+        style={[styles.input, errorMsg.email && styles.inputError]} 
         placeholder="Email" 
         placeholderTextColor="#aaa" 
+        autoCapitalize="none"
         keyboardType='email-address'
         onChangeText={(text) => handleInputChange('email', text)}
+        value={form.email}
       />
 
       {errorMsg.email ? <Text style={styles.errorMsg}>{errorMsg.email}</Text> : null}
 
       <TextInput 
-        style={styles.input} 
+        style={[styles.input, errorMsg.password && styles.inputError]} 
         placeholder="Password" 
         placeholderTextColor="#aaa" 
         secureTextEntry={true}
@@ -94,12 +94,11 @@ export default function App() {
 
       {errorMsg.password ? <Text style={styles.errorMsg}>{errorMsg.password}</Text> : null}
 
-      {/* <Link href="/(home)" style={styles.linkText}>Masuk</Link> */}
       <Button handlePress = {handleSubmit} text = "Login"/>
 
-      <Text style={{alignSelf: "flex-start", padding: 10}}>
+      <Text style={styles.link}>
         Don't have account? {""}
-        <Link href="/register" style={styles.register}>
+        <Link href="/register" style={styles.linkText}>
         Register here</Link>
       </Text>
 
@@ -134,17 +133,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginTop: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#FAFBFD',
     fontSize: 16,
   },
-  register: {
+  inputError: {
+    borderColor: "red",
+  },
+  link: {
+    alignSelf: "flex-start", 
+    padding: 10,
+    marginTop: 5,
+    textAlign: "left",
+    width: "100%"
+  },
+  linkText: {
     color: '#19918F',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
     alignSelf: "flex-start"
-  },
-  linkText: {
-    color: '#19918F'
   },
   errorMsg: {
     color: 'red',

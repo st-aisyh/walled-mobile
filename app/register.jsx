@@ -8,10 +8,11 @@ import Checkbox from 'expo-checkbox';
 
 export default function Register() {
     const [isChecked, setChecked] = useState(false);
-    const navigation = useNavigation();
-    const handleRegister = () => {
-        navigation.navigate('index');
-    }
+    const [modalVisible, setModalVisible] = useState(false);
+    // const navigation = useNavigation();
+    // const handleRegister = () => {
+    //     navigation.navigate('index');
+    // }
     
   return (
     <View style={styles.container}>
@@ -57,19 +58,18 @@ export default function Register() {
           color={isChecked ? '#4630EB' : undefined}
         />
 
-        <Text style={{alignSelf: "flex-start", padding: 10}}>
+        <Text style={styles.tncText}>
           I have read and agree to the {""}
           <Link href="/tnc">
-            <Text style={styles.register}>Terms and Conditions</Text>
+            <Text style={styles.tncLink}>Terms and Conditions</Text>
           </Link> 
           <Text style={{color:'red'}}> *</Text>
         </Text>
-
       </View>
 
-      <Button text = "Register" onPress={handleRegister}/>
+      <Button style={styles.button} text = "Register"/>
 
-      <Text style={styles.text}> Already have account? <Link href="/" style={styles.register}>Sign in here</Link> </Text>
+      <Text style={styles.tncText}> Already have account? <Link href="/" style={styles.tncLink}>Login here</Link> </Text>
 
       <StatusBar style="auto" hidden />
     </View>
@@ -103,18 +103,23 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#FAFBFD',
     fontSize: 15,
-  },
-  register: {
-    color: '#19918F',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-    fontSize: 13
   },
   tnc: {
     flexDirection: 'row',
     alignItems: 'center'
+  },
+  tncText: {
+    alignSelf: "flex-start",
+    padding: 10,
+    fontSize: 13
+  },
+  tncLink: {
+    color: '#19918F',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    fontSize: 13
   },
   button: {
     borderRadius: 20,
