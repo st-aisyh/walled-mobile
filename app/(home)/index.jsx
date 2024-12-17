@@ -1,23 +1,60 @@
-import { Link, Stack } from 'expo-router';
 import { Image, Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-function LogoTitle() {
+function LogoTitle({user}) {
+  const [isAvatarActive, setIsAvatarActive] = useState(true);
   return (
-    <Image style={styles.image} source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }} />
+    <TouchableOpacity
+      style={[
+        styles.avatarContainer,
+        { borderColor: setIsAvatarActive ? '#178F8D' : '#fafbfd' },
+      ]}
+      onPress={() => setIsAvatarActive((prev) => !prev)}
+      activeOpacity={0.8}
+    >
+      <Image style={styles.image} source={{uri:user?.avatar_url}} />
+    </TouchableOpacity >
+
   );
 }
-
 export default function Home() {
+  const [user,setUser]= useState({})
+  useEffect (() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('token');
+        if (value != null) {
+          const res = await axios.get("http://192.168.30.41:8080/profile", 
+            {
+              headers: {
+              Authorization: `Bearer ${value}`,
+              },
+            }
+          );
+          console.log(value)
+          console.log(res.data)
+          const user = res.data.data
+          setUser(user)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    };
+    getData();
+  }, [])
+
   return (
     <ScrollView containerStyle={styles.container}>
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Image source={require('../../assets/avatar.png')} style={{ width: 50, height: 50 }} />
+          <LogoTitle user={user} />
           <View>
             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{user.fullname}</Text>
-            <Text style={{ fontSize: 18 }}>{user.typeofaccount}</Text>
+            <Text style={{ fontSize: 18 }}>Personal Account</Text>
           </View>
         </View>
         <Image source={require('../../assets/suntoggle.png')} />
@@ -25,21 +62,23 @@ export default function Home() {
       <View style={{ backgroundColor: '#FAFBFD', paddingHorizontal: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 25, justifyContent: 'space-between' }}>
           <View style={{ width: '70%' }}>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 8 }}>Good Morning, {user.fullname.split(' ')[0]}</Text>
-            <Text style={{ fontSize: 18 }}>Check all your incoming and outgoing transactions here</Text>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 8 }}>Good Morning, {user?.username}!</Text>
+            <Text style={{ fontSize: 16 }}>Check all your incoming and outgoing transactions here</Text>
           </View>
           <Image source={require('../../assets/sun.png')} style={{ width: 81, height: 77 }} />
         </View>
 
         <View style={styles.accountnumber}>
           <Text style={{ color: '#fff', fontSize: 18 }}>Account No.</Text>
-          <Text style={{ fontWeight: 'bold', color: '#fff', fontSize: 18 }}>{user.accountnumber}</Text>
+          <Text style={{ fontWeight: 'bold', color: '#fff', fontSize: 18 }}>79732300{user?.id}</Text>
         </View>
 
         <View style={styles.balancebox}>
           <View>
             <Text style={{ fontSize: 20 }}>Balance</Text>
-            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Rp {user.balance}</Text>
+            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
+              Rp{new Intl.NumberFormat('id-ID').format(user.balance)}
+            </Text>
           </View>
           <View>
             <View style={{ gap: 20 }}>
@@ -132,7 +171,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 20,
     paddingBottom: 12,
     backgroundColor: '#fff'
   },
@@ -142,5 +181,6 @@ const styles = StyleSheet.create({
   image: {
     width: 50,
     height: 50,
+    borderRadius: 50
   },
 });

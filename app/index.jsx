@@ -1,21 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TextInput, Image, Text } from 'react-native';
 import Button from '../components/Button';
-import { Link, useNavigation } from 'expo-router';
+import { Link, useNavigation, useRouter, router } from 'expo-router';
 import {z} from "zod";
 import { useState } from 'react';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginSchema = z.object({
   email: z.string().email({message: "invalid email address"}),
-  password: z.string().min(8, { message : "Must be 8 character or more long"})
+  password: z.string().min(4, { message : "Must be 4 character or more long"})
 });
 
 export default function App() {
   const [form, setForm] = useState({email: "", password: ""});
   const [errorMsg, setErrors] = useState({});
+  const[serverError, setServerError] = useState("");
+
+  const router = useRouter();
 
   const handleInputChange = (key, value) => {
     setForm({...form, [key]: value });
+
     try{
       LoginSchema.pick({ [key]: true }).parse({ [key]: value });
       setErrors((prev) => ({ ...prev, [key]: "" })); 
@@ -24,26 +30,47 @@ export default function App() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     try {
         LoginSchema.parse(form);
+
+        const res = await axios.post("http://192.168.30.41:8080/auth/login", form);
+
+        await AsyncStorage.setItem("token", res.data.data.token);
+        router.replace("/(home)")
     } catch (error) {
-      const errors = {};
-      err.errors.forEach((item) => {
-        const key = item.path[0];
-        errors[key] = item.message;
+      if(axios.isAxiosError(error)) {
+        if(error.response) {
+          setServerError(error.response.data.message || "An error occurred");
+        } else if (error.request) {
+          setServerError("Network error. Please try again later.");
+          console.error("Network error:", error.request);
+        } else {
+          setServerError("An unexpected error occurred.");
+          console.error("Request Setup Error:", error.message);
+        }
+      } else if(error?.errors) {
+        const errors = {};
+        err.errors.forEach((item) => {
+          const key = item.path[0];
+          errors[key] = item.message;
       });
       setErrors(errors);
+    } else {
+      setServerError("An unknown error occurred.");
+      console.error("Unhandled Error:", error);
     }
-  };
+  }
+};
 
   return (
     <View style={styles.container}>
+      {serverError && <Text style={styles.errorMsg}>{serverError}</Text>}
 
       <Image
-      source={require('../assets/logo.png')}
-      style={styles.logo}
-      resizeMode='stretch'
+        source={require('../assets/logo.png')}
+        style={styles.logo}
+        resizeMode='stretch'
       />
       
       <TextInput 
