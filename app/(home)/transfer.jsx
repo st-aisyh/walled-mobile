@@ -1,43 +1,113 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, useState, Image } from "react-native";
-import Input from "../../components/input";
-import Amount from "../../components/Amount";
-import Button from "../../components/Button";
+import { useState } from 'react';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, } from 'react-native';
 
 export default function Transfer() {
-    const [showBalance, setShowBalance] = useState(true);
+    const [value, setValue] = useState('');
+
+    // Fungsi untuk menambahkan titik setiap ribuan
+    const formatNumber = (text) => {
+        const cleaned = text.replace(/\D/g, ''); // Menghapus karakter non-digit
+        return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Menambahkan titik setiap ribuan
+    };
+
+    const handleInputChange = (text) => {
+        const formattedValue = formatNumber(text);
+        setValue(formattedValue);
+    };
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: '#ddd' }}>
-            <View style={{backgroundColor: '#19918F', paddingHorizontal: 20, paddingVertical: 8, width: '100%', flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 18 }}>To:</Text>
-                <TextInput style={{ fontSize: 18 }} keyboardType="number-pad" placeholder="insert account number" placeholderTextColor={'#fff'} color={'#fff'} />
-            </View>
-            <View style={styles.container}>
-                <View>
-               
-                    <Amount 
-                        showBalance={true} 
-                        marginBottom={24} 
-                        balance={showBalance ? "Rp10.000.000,00" : "Rp ********"} 
-                    />
-                  <Image 
-                    source={{ uri: "../../assets/view.png" }}
-                    resizeMode= 'contain'
-                    onTouchEnd={() => setShowBalance((prev) => !prev)}
-                />
-                    <Input text={"Notes"} />
+        <View style={{ alignItems: 'center', flex: 1, justifyContent: "space-between" }}>
+            <View style={{ alignItems: 'center', width: '100%' }}>
+                <View style={styles.to}>
+                    <Text style={{ fontSize: 16, color: '#fff' }}>To:   9000008940208</Text>
                 </View>
-                <Button marginTop={240} marginBottom={20} text="Transfer" />
+
+                <View style={styles.container}>
+                    <Text style={styles.placeholder}>Amount</Text>
+                    <Text style={styles.currency}>
+                        IDR<Text style={styles.superscript}></Text>
+                    </Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        placeholder="0"
+                        value={value}
+                        onChangeText={handleInputChange}
+                    />
+                    <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
+                        <View>
+                            <Text style={{ color: "#B3b3b3", fontSize: 14 }}>Balance</Text>
+                        </View>
+                        <View>
+                            <Text style={{ color: "#19918F", fontSize: 14 }}>IDR 10.000.0000</Text>
+                        </View>
+                    </View>
+                </View>
+
+                <View style={styles.notebox}>
+                    <Text style={styles.placeholder}>Notes</Text>
+                    <TextInput style={styles.inputnote} />
+                </View>
             </View>
-        </ScrollView>
-    );
+
+            <TouchableOpacity>
+                <View style={styles.buttontrans}>
+                    <Text style={{ fontWeight: 'bold', color: '#fff', fontSize: 18, }}>Transfer</Text>
+                </View>
+            </TouchableOpacity>
+
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'space-between',
-        justifyContent: 'center',
+        width: "100%",
         padding: 20,
-        backgroundColor: '#fff',
-    }
+        backgroundColor: "white",
+        marginTop: 25,
+    },
+    to: {
+        width: "100%",
+        padding: 20,
+        backgroundColor: "#19918F",
+    },
+    notebox: {
+        width: "100%",
+        padding: 20,
+        backgroundColor: "white",
+        marginTop: 25,
+    },
+    placeholder: {
+        color: "#B3b3b3",
+        fontSize: 16,
+    },
+    currency: {
+        fontSize: 16,
+    },
+    superscript: {
+        fontSize: 10,
+        lineHeight: 10,
+        position: 'relative',
+    },
+    input: {
+        borderBottomColor: "#B3B3B3",
+        borderBottomWidth: 0.5,
+        fontSize: 30,
+        width: '100%',
+    },
+    inputnote: {
+        fontSize: 16,
+        borderBottomColor: "#B3B3B3",
+        borderBottomWidth: 0.5,
+        width: '100%',
+    },
+    buttontrans: {
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        width: 397,
+        alignItems: 'center',
+        backgroundColor: '#19918F',
+        borderRadius: 10,
+        marginBottom: 15,
+    },
 });
